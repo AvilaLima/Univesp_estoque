@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% block content %}    
+<h1>Lista de Produtos</h1>
+<form method="post" action="{% url 'produtos' %}">
+    {% csrf_token %}
+    {% if error != null%}
+        <div class="alert alert-danger" role="alert">
+            {{error}}
+        </div>
+    {% endif %} 
+    <table class="table table-bordered table-light">
+        <tr>
+            <th>Marca</th>
+            <th>Descrição</th>
+            <th>Unidade de Medida</th>
+        </tr>
+        {% if not form.instance.id %}
+            <tr>
+                {% include 'save.html' %}
+            </tr>
+        {% endif %} 
+        {% for produto in produtos %}
+            <tr>
+                {% if form.instance.id == produto.id %}                
+                    {% include 'funcionarios/save.html' %}
+                {% else %}
+                    <td>{{ produto.marca }}</td> 
+                    <td>{{ produto.descricao }}</td>  
+                    <td>{{ produto.unidade_medida }}</td>           
+                    <td>
+                        <button formnovalidate class="btn btn-success" name="edit" value="{{ produto.id }}">Edit</button>
+                        <button formnovalidate class="btn btn-danger" name="delete" value="{{ produto.id }}">Delete</button>
+                    </td>
+                {% endif %}
+            </tr>
+        {% endfor %}
+    </table>
+</form>
+<a href="{% url 'estoques' %}">Estoque</a>
+<a href="{% url 'funcionarios' %}">Funcionários</a>
+<a href="{% url 'about' %}">About Page</a>
+{% endblock %}

@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% block content %}    
+<h1>Estoque</h1>
+<form method="post" action="{% url 'estoque' %}">
+    {% csrf_token %}
+    {% if error != null%}
+        <div class="alert alert-danger" role="alert">
+            {{error}}
+        </div>
+    {% endif %} 
+    <table class="table table-bordered table-light">
+        <tr>
+            <th>Ação</th>
+            <th>Quantidade</th>
+            <th>Data de Validade</th>
+            <th>Produto</th>
+            <th>Funcionário</th>
+        </tr>
+        {% if not form.instance.id %}
+            <tr>
+                {% include 'save.html' %}
+            </tr>
+        {% endif %} 
+        {% for item in estoque %}
+            <tr>
+                {% if form.instance.id == item.id %}                
+                    {% include 'estoque/save.html' %}
+                {% else %}
+                    <td>{{ item.acao }}</td> 
+                    <td>{{ item.quantidade }}</td>   
+                    <td>{{ item.data_vencimento }}</td> 
+                    <td>{{ item.produto }}</td> 
+                    <td>{{ item.funcionario }}</td>         
+                    <td>
+                        <button formnovalidate class="btn btn-success" name="edit" value="{{ item.id }}">Edit</button>
+                        <button formnovalidate class="btn btn-danger" name="delete" value="{{ item.id }}">Delete</button>
+                    </td>
+                {% endif %}
+            </tr>
+        {% endfor %}
+    </table>
+</form>
+<a href="{% url 'produtos' %}">Produtos</a>
+<a href="{% url 'funcionarios' %}">Funcionários</a>
+<a href="{% url 'about' %}">About Page</a>
+{% endblock %}
