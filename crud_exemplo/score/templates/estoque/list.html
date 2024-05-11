@@ -15,6 +15,7 @@
             <th>Data de Validade</th>
             <th>Produto</th>
             <th>Funcionário</th>
+            <th>Ação</th>
         </tr>
         {% if not form.instance.id %}
             <tr>
@@ -26,12 +27,12 @@
                 {% if form.instance.id == item.id %}                
                     {% include 'estoque/save.html' %}
                 {% else %}
-                    <td>{{ item.acao }}</td> 
-                    <td>{{ item.quantidade }}</td>   
-                    <td>{{ item.data_vencimento }}</td> 
-                    <td>{{ item.produto }}</td> 
-                    <td>{{ item.funcionario }}</td>         
-                    <td>
+                    <td class="col-sm-1">{{ item.acao }}</td> 
+                    <td class="col-sm-1">{{ item.quantidade }}</td>   
+                    <td class="col-sm-2">{{ item.data_vencimento }}</td> 
+                    <td class="col-sm-2">{{ item.produto }}</td> 
+                    <td class="col-sm-2">{{ item.funcionario }}</td>         
+                    <td class="col-sm-2">
                         <button formnovalidate class="btn btn-success" name="edit" value="{{ item.id }}">Edit</button>
                         <button formnovalidate class="btn btn-danger" name="delete" value="{{ item.id }}">Delete</button>
                     </td>
@@ -40,7 +41,7 @@
         {% endfor %}
     </table>
 </form>
-<a href="{% url 'produtos' %}">Produtos</a>
+<a href="{% url 'relatorio' %}">Relatorio</a>
 <a href="{% url 'funcionarios' %}">Funcionários</a>
-<a href="{% url 'about' %}">About Page</a>
+<a href="{% url 'produtos' %}">Produtos</a>
 {% endblock %}

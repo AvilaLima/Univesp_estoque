@@ -9,7 +9,10 @@
         </div>
     {% endif %} 
     <table class="table table-bordered table-light">
-        <tr><th>Funcionarios</th><th>Setor</th><th>Action</th></tr>
+        <tr><th>Funcionarios</th>
+            <th>Setor</th>
+            <th>Ação</th>
+        </tr>
         {% if not form.instance.id %}
             <tr>
                 {% include 'save.html' %}
@@ -20,9 +23,9 @@
                 {% if form.instance.id == funcionario.id %}                
                     {% include 'funcionarios/save.html' %}
                 {% else %}
-                    <td>{{ funcionario.nome }}</td> 
-                    <td>{{ funcionario.setor }}</td>            
-                    <td>
+                    <td class="col-sm-3">{{ funcionario.nome }}</td> 
+                    <td class="col-sm-3">{{ funcionario.setor }}</td>            
+                    <td class="col-sm-3">
                         <button formnovalidate class="btn btn-success" name="edit" value="{{ funcionario.id }}">Edit</button>
                         <button formnovalidate class="btn btn-danger" name="delete" value="{{ funcionario.id }}">Delete</button>
                     </td>
@@ -31,7 +34,7 @@
         {% endfor %}
     </table>
 </form>
+<a href="{% url 'relatorio' %}">Relatorio</a>
 <a href="{% url 'estoque' %}">Estoque</a>
 <a href="{% url 'produtos' %}">Produtos</a>
-<a href="{% url 'about' %}">About Page</a>
 {% endblock %}

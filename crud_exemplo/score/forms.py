@@ -10,11 +10,20 @@ class FuncionarioForm(forms.ModelForm):
     class Meta:
         model = Funcionario
         fields = ['nome','setor']
+        widgets = {
+            'nome': forms.DateInput(attrs={'class': 'form-control form-select-sm'}),
+            'setor': forms.Select(attrs={'class':'form-select form-select-sm'}),
+            }
 
 class ProdutoForm(forms.ModelForm):
     class Meta:
         model = Produto
         fields = ['marca','descricao','unidade_medida']
+        widgets = {
+        'marca': forms.DateInput(attrs={'class': 'form-control form-select-sm'}),
+        'descricao': forms.DateInput(attrs={'class': 'form-control form-select-sm'}),
+        'unidade_medida': forms.Select(attrs={'class':'form-select form-select-sm'}),
+        }
 
 class EstoqueForm(forms.ModelForm):
     class Meta:

@@ -1,33 +1,7 @@
 {% extends 'base.html' %}
 {% block content %}    
-<h1>Hello, World!</h1>
-<form method="post" action="{% url 'index' %}">
-    {% csrf_token %}
-    <table class="table table-bordered table-light">
-        <tr><th>Name</th><th>Score</th><th>Action</th></tr>
-        {% if not form.instance.id %}
-            <tr>
-                {% include 'save.html' %}
-            </tr>
-        {% endif %} 
-        {% for score in scores %}
-            <tr>
-                {% if form.instance.id == score.id %}                
-                    {% include 'save.html' %}
-                {% else %}
-                    <td>{{ score.name }}</td> 
-                    <td>{{ score.value }}</td>            
-                    <td>
-                        <button formnovalidate class="btn btn-success" name="edit" value="{{ score.id }}">Edit</button>
-                        <button formnovalidate class="btn btn-danger" name="delete" value="{{ score.id }}">Delete</button>
-                    </td>
-                {% endif %}
-            </tr>
-        {% endfor %}
-    </table>
-</form>
+<a href="{% url 'relatorio' %}">Relatorio</a>
 <a href="{% url 'estoque' %}">Estoque</a>
 <a href="{% url 'funcionarios' %}">Funcionários</a>
 <a href="{% url 'produtos' %}">Produtos</a>
-<a href="{% url 'about' %}">About Page</a>
 {% endblock %}

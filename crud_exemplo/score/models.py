@@ -69,3 +69,11 @@ class Estoque(models.Model):
     
     class Meta:
         ordering = ['produto','acao','data_controle','data_vencimento','funcionario'] #asc
+
+class ItemEstoqueViewModel:
+    def __init__(self, descricao, saldo):
+        self.descricao = descricao
+        self.saldo = saldo
+
+    def __str__(self):
+        return f"Produto: {self.descricao}, Saldo: {self.saldo}"

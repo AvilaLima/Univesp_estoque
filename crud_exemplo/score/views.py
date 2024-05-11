@@ -1,34 +1,13 @@
 from django.shortcuts import render
 from datetime import datetime
-from score.models import Score,Funcionario,Produto,Estoque
+from score.models import Score,Funcionario,Produto,Estoque,ItemEstoqueViewModel
 from score.forms import ScoreForm,FuncionarioForm,ProdutoForm,EstoqueForm
+from django.db.models import Sum
 # Create your views here.
 
 def index(request):
     context = {}
-    form = ScoreForm()
-    scores = Score.objects.all()
-    context['scores']= scores
-    context['title']= 'Home'
-    if request.method == 'POST':
-        if 'save' in request.POST:            
-            pk = request.POST.get('save')
-            if not pk:
-                form = ScoreForm(request.POST)
-            else:
-                score = Score.objects.get(id=pk)
-                form = ScoreForm(request.POST, instance=score)
-            form.save()            
-            form = ScoreForm()
-        elif 'delete' in request.POST:
-            pk = request.POST.get('delete')
-            score = Score.objects.get(id=pk)
-            score.delete()
-        elif 'edit' in request.POST:
-            pk = request.POST.get('edit')
-            score = Score.objects.get(id=pk)
-            form = ScoreForm(instance=score)
-    context['form'] = form
+    
     return render(request, 'index.html', context)
 
 def about(request):
@@ -101,7 +80,7 @@ def estoque(request):
     form = EstoqueForm()
     context['title']= 'Estoque'
     estoque = Estoque.objects.all()
-    context['estoque']= estoque
+    context['estoque']= estoque    
     if request.method == 'POST':
         if 'save' in request.POST:            
             pk = request.POST.get('save')
@@ -126,3 +105,33 @@ def estoque(request):
             form = EstoqueForm(instance=estoque)
     context['form'] = form
     return render(request, 'estoque/list.html', context)
+
+def relatorio(request):    
+    context = {}
+
+    # Obter os itens de entrada e saída do estoque
+    itens_entrada = Estoque.objects.filter(acao='ENT').values('produto__id').annotate(total_quantidade=Sum('quantidade'))
+    itens_saida = Estoque.objects.filter(acao='SAI').values('produto__id').annotate(total_quantidade=Sum('quantidade'))
+
+    # Criar um dicionário para mapear o ID do produto ao total de entrada
+    entrada_dict = {item['produto__id']: item['total_quantidade'] for item in itens_entrada}
+
+    # Criar um dicionário para mapear o ID do produto ao total de saída
+    saida_dict = {item['produto__id']: item['total_quantidade'] for item in itens_saida}
+
+    # Calcular o saldo para cada produto
+    estoque_final = {}
+    for produto_id, quantidade_entrada in entrada_dict.items():
+        quantidade_saida = saida_dict.get(produto_id, 0)
+        saldo = quantidade_entrada - quantidade_saida
+        # Buscar a descrição do produto pelo ID
+        descricao = Estoque.objects.filter(produto__id=produto_id).first().produto.descricao
+        estoque_final[produto_id] = {'descricao': descricao, 'saldo': saldo}
+
+    # Criar instâncias da view model ItemEstoqueViewModel
+    estoque_final_view_model = [ItemEstoqueViewModel(descricao=item['descricao'], saldo=item['saldo']) for produto_id, item in estoque_final.items()]
+
+    # Passar o estoque_final_view_model para o template
+    context['estoque_final'] = estoque_final_view_model
+        
+    return render(request, 'relatorio/list.html', context)

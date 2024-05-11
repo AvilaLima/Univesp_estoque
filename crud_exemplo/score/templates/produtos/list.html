@@ -8,11 +8,12 @@
             {{error}}
         </div>
     {% endif %} 
-    <table class="table table-bordered table-light">
+    <table class="table table-bordered table-light table-responsive-sm caption-top ">
         <tr>
-            <th>Marca</th>
-            <th>Descrição</th>
-            <th>Unidade de Medida</th>
+            <th class="col-sm-3">Marca</th>
+            <th class="col-sm-3">Descrição</th>
+            <th class="col-sm-2">Unidade de Medida</th>
+            <th class="col-sm-4">Ação</th>
         </tr>
         {% if not form.instance.id %}
             <tr>
@@ -24,10 +25,10 @@
                 {% if form.instance.id == produto.id %}                
                     {% include 'funcionarios/save.html' %}
                 {% else %}
-                    <td>{{ produto.marca }}</td> 
-                    <td>{{ produto.descricao }}</td>  
-                    <td>{{ produto.unidade_medida }}</td>           
-                    <td>
+                    <td class="col-sm-3">{{ produto.marca }}</td> 
+                    <td class="col-sm-3">{{ produto.descricao }}</td>  
+                    <td class="col-sm-2">{{ produto.unidade_medida }}</td>           
+                    <td class="col-sm-1">
                         <button formnovalidate class="btn btn-success" name="edit" value="{{ produto.id }}">Edit</button>
                         <button formnovalidate class="btn btn-danger" name="delete" value="{{ produto.id }}">Delete</button>
                     </td>
@@ -36,7 +37,8 @@
         {% endfor %}
     </table>
 </form>
-<a href="{% url 'estoques' %}">Estoque</a>
+<a href="{% url 'relatorio' %}">Relatorio</a>
+<a href="{% url 'estoque' %}">Estoque</a>
 <a href="{% url 'funcionarios' %}">Funcionários</a>
-<a href="{% url 'about' %}">About Page</a>
+<a href="{% url 'produtos' %}">Produtos</a>
 {% endblock %}
