@@ -11,10 +11,10 @@ class SetorAdmin(admin.ModelAdmin):
     list_display = ['nome']
     
 class ProdutoAdmin(admin.ModelAdmin):
-    list_display = ['marca','descricao','unidade_medida']
+    list_display = ['referencia','marca','descricao','unidade_medida']
 
 class EstoqueAdmin(admin.ModelAdmin):
-    list_display = ['produto','funcionario','acao','quantidade','data_controle','data_vencimento']
+    list_display = ['produto','funcionario','acao','quantidade','data_controle']
 
 # Register your models hee.
 admin.site.register(Score, ScoreAdmin)

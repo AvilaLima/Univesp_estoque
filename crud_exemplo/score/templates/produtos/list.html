@@ -10,27 +10,29 @@
     {% endif %} 
     <table class="table table-bordered table-light table-responsive-sm caption-top ">
         <tr>
-            <th class="col-sm-3">Marca</th>
-            <th class="col-sm-3">Descrição</th>
-            <th class="col-sm-2">Unidade de Medida</th>
-            <th class="col-sm-4">Ação</th>
+            <th class="col-sm-1">Referência</th>
+            <th class="col-sm-1">Marca</th>
+            <th class="col-sm-1">Descrição</th>
+            <th class="col-sm-1">Unidade de Medida</th>
+            <th class="col-sm-3">Ação</th>
         </tr>
         {% if not form.instance.id %}
             <tr>
-                {% include 'save.html' %}
+                {% include 'produtos/save.html' %}
             </tr>
         {% endif %} 
         {% for produto in produtos %}
             <tr>
-                {% if form.instance.id == produto.id %}                
-                    {% include 'funcionarios/save.html' %}
+                {% if form.instance.id == produto.id %}      
+                    {% include 'produtos/save.html' %}
                 {% else %}
-                    <td class="col-sm-3">{{ produto.marca }}</td> 
-                    <td class="col-sm-3">{{ produto.descricao }}</td>  
+                    <td class="col-sm-1">{{ produto.referencia }}</td> 
+                    <td class="col-sm-1">{{ produto.marca }}</td> 
+                    <td class="col-sm-2">{{ produto.descricao }}</td>  
                     <td class="col-sm-2">{{ produto.unidade_medida }}</td>           
                     <td class="col-sm-1">
-                        <button formnovalidate class="btn btn-success" name="edit" value="{{ produto.id }}">Edit</button>
-                        <button formnovalidate class="btn btn-danger" name="delete" value="{{ produto.id }}">Delete</button>
+                        <button formnovalidate class="btn btn-success" name="edit" value="{{ produto.id }}">Editar</button>
+                        <button formnovalidate class="btn btn-danger" name="delete" value="{{ produto.id }}">Excluir</button>
                     </td>
                 {% endif %}
             </tr>

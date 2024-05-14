@@ -15,19 +15,19 @@
         </tr>
         {% if not form.instance.id %}
             <tr>
-                {% include 'save.html' %}
+                {% include 'funcionarios/save.html' %}
             </tr>
         {% endif %} 
         {% for funcionario in funcionarios %}
             <tr>
-                {% if form.instance.id == funcionario.id %}                
+                {% if form.instance.id == funcionario.id %}     
                     {% include 'funcionarios/save.html' %}
                 {% else %}
                     <td class="col-sm-3">{{ funcionario.nome }}</td> 
                     <td class="col-sm-3">{{ funcionario.setor }}</td>            
                     <td class="col-sm-3">
-                        <button formnovalidate class="btn btn-success" name="edit" value="{{ funcionario.id }}">Edit</button>
-                        <button formnovalidate class="btn btn-danger" name="delete" value="{{ funcionario.id }}">Delete</button>
+                        <button formnovalidate class="btn btn-success" name="edit" value="{{ funcionario.id }}">Editar</button>
+                        <button formnovalidate class="btn btn-danger" name="delete" value="{{ funcionario.id }}">Excluir</button>
                     </td>
                 {% endif %}
             </tr>

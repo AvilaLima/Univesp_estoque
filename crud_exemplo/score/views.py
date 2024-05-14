@@ -1,13 +1,13 @@
 from django.shortcuts import render
-from datetime import datetime
-from score.models import Score,Funcionario,Produto,Estoque,ItemEstoqueViewModel
-from score.forms import ScoreForm,FuncionarioForm,ProdutoForm,EstoqueForm
+from score.models import Funcionario,Produto,Estoque,ItemRelatorioViewModel
+from score.forms import FuncionarioForm,ProdutoForm,EstoqueForm
 from django.db.models import Sum
+from django.db.models.functions import ExtractMonth
+from collections import defaultdict
 # Create your views here.
 
 def index(request):
     context = {}
-    
     return render(request, 'index.html', context)
 
 def about(request):
@@ -106,32 +106,73 @@ def estoque(request):
     context['form'] = form
     return render(request, 'estoque/list.html', context)
 
-def relatorio(request):    
+
+def relatorio(request):
     context = {}
+    
+    # Dicionário de nomes dos meses
+    meses = {
+        1: "Janeiro", 2: "Fevereiro", 3: "Março", 4: "Abril", 
+        5: "Maio", 6: "Junho", 7: "Julho", 8: "Agosto", 
+        9: "Setembro", 10: "Outubro", 11: "Novembro", 12: "Dezembro"
+    }
 
-    # Obter os itens de entrada e saída do estoque
-    itens_entrada = Estoque.objects.filter(acao='ENT').values('produto__id').annotate(total_quantidade=Sum('quantidade'))
-    itens_saida = Estoque.objects.filter(acao='SAI').values('produto__id').annotate(total_quantidade=Sum('quantidade'))
+    # Obter os itens de entrada e saída do estoque agrupados por mês
+    entradas_por_mes = defaultdict(lambda: defaultdict(int))
+    saidas_por_mes = defaultdict(lambda: defaultdict(int))
+    
+    # Obter entradas por mês
+    itens_entrada = Estoque.objects.filter(acao='ENT') \
+        .annotate(mes=ExtractMonth('data_controle')) \
+        .values('produto__id', 'mes', 'produto__descricao') \
+        .annotate(total_quantidade=Sum('quantidade'))
+    
+    for item in itens_entrada:
+        produto_nome = item['produto__descricao']
+        mes = meses[item['mes']]
+        quantidade = item['total_quantidade']
+        entradas_por_mes[produto_nome][mes] += quantidade
+    
+    # Obter saídas por mês
+    itens_saida = Estoque.objects.filter(acao='SAI') \
+        .annotate(mes=ExtractMonth('data_controle')) \
+        .values('produto__id', 'mes', 'produto__descricao') \
+        .annotate(total_quantidade=Sum('quantidade'))
+    
+    for item in itens_saida:
+        produto_nome = item['produto__descricao']
+        mes = meses[item['mes']]
+        quantidade = item['total_quantidade']
+        saidas_por_mes[produto_nome][mes] += quantidade
+            
+    # Calcular o saldo (ENT - SAI) para cada produto por mês
+    saldo_por_produto = defaultdict(lambda: defaultdict(int))
+    for produto_nome in set(entradas_por_mes.keys()).union(saidas_por_mes.keys()):
+        for mes in set(entradas_por_mes[produto_nome].keys()).union(saidas_por_mes[produto_nome].keys()):
+            saldo_por_produto[produto_nome][mes] = entradas_por_mes[produto_nome][mes] - saidas_por_mes[produto_nome][mes]
+   
+    # Calcular o saldo total por produto
+    saldo_total_por_produto = {produto: sum(saldos.values()) for produto, saldos in saldo_por_produto.items()}
 
-    # Criar um dicionário para mapear o ID do produto ao total de entrada
-    entrada_dict = {item['produto__id']: item['total_quantidade'] for item in itens_entrada}
+    # Criar lista de itens do relatório usando a view model
+    itens_relatorio = []
+    for produto_nome, meses_saldo in saldo_por_produto.items():
+        for mes, saldo in meses_saldo.items():
+            total_entrada = entradas_por_mes[produto_nome][mes]
+            total_saida = saidas_por_mes[produto_nome][mes]
+            itens_relatorio.append(ItemRelatorioViewModel(
+                produto=produto_nome,
+                mes=mes,
+                total_entrada=total_entrada,
+                total_saida=total_saida,
+                saldo=saldo
+            ))
 
-    # Criar um dicionário para mapear o ID do produto ao total de saída
-    saida_dict = {item['produto__id']: item['total_quantidade'] for item in itens_saida}
+    # Ordenar os itens do relatório por mês, produto e quantidade
+    itens_relatorio.sort(key=lambda item: (list(meses.keys())[list(meses.values()).index(item.mes)], item.produto, item.saldo))
 
-    # Calcular o saldo para cada produto
-    estoque_final = {}
-    for produto_id, quantidade_entrada in entrada_dict.items():
-        quantidade_saida = saida_dict.get(produto_id, 0)
-        saldo = quantidade_entrada - quantidade_saida
-        # Buscar a descrição do produto pelo ID
-        descricao = Estoque.objects.filter(produto__id=produto_id).first().produto.descricao
-        estoque_final[produto_id] = {'descricao': descricao, 'saldo': saldo}
+    # Passar os dados para o template
+    context['itens_relatorio'] = itens_relatorio
+    context['saldo_total_por_produto'] = saldo_total_por_produto
 
-    # Criar instâncias da view model ItemEstoqueViewModel
-    estoque_final_view_model = [ItemEstoqueViewModel(descricao=item['descricao'], saldo=item['saldo']) for produto_id, item in estoque_final.items()]
-
-    # Passar o estoque_final_view_model para o template
-    context['estoque_final'] = estoque_final_view_model
-        
     return render(request, 'relatorio/list.html', context)

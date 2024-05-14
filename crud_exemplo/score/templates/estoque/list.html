@@ -10,31 +10,31 @@
     {% endif %} 
     <table class="table table-bordered table-light">
         <tr>
+            <th>Data de Controle</th>
             <th>Ação</th>
             <th>Quantidade</th>
-            <th>Data de Validade</th>
             <th>Produto</th>
             <th>Funcionário</th>
             <th>Ação</th>
         </tr>
         {% if not form.instance.id %}
             <tr>
-                {% include 'save.html' %}
+                {% include 'estoque/save.html' %}
             </tr>
         {% endif %} 
         {% for item in estoque %}
             <tr>
-                {% if form.instance.id == item.id %}                
+                {% if form.instance.id == item.id %}    
                     {% include 'estoque/save.html' %}
                 {% else %}
+                    <td class="col-sm-2">{{ item.data_controle }}</td> 
                     <td class="col-sm-1">{{ item.acao }}</td> 
                     <td class="col-sm-1">{{ item.quantidade }}</td>   
-                    <td class="col-sm-2">{{ item.data_vencimento }}</td> 
                     <td class="col-sm-2">{{ item.produto }}</td> 
                     <td class="col-sm-2">{{ item.funcionario }}</td>         
                     <td class="col-sm-2">
-                        <button formnovalidate class="btn btn-success" name="edit" value="{{ item.id }}">Edit</button>
-                        <button formnovalidate class="btn btn-danger" name="delete" value="{{ item.id }}">Delete</button>
+                        <button formnovalidate class="btn btn-success" name="edit" value="{{ item.id }}">Editar</button>
+                        <button formnovalidate class="btn btn-danger" name="delete" value="{{ item.id }}">Excluir</button>
                     </td>
                 {% endif %}
             </tr>

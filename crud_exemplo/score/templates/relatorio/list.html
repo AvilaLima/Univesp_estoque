@@ -1,20 +1,54 @@
 {% extends 'base.html' %}
 {% block content %}    
-<h1>Relatório</h1>
-<table class="table table-striped table-bordered">
-    <tr>
-        <th>Descrição</th>
-        <th>Saldo</th>
-    </tr>
-    {% for item in estoque_final %}
-        <tr>
-            <td class="col-sm-6">{{ item.descricao }}</td> 
-            <td class="col-sm-3">{{ item.saldo }}</td>  
-        </tr>
-    {% endfor %}
-</table>
+    <h1>Relatório de Estoque</h1>
+    <!-- Saldo Total por Produto -->
+    <h2>Situação atual por Produto</h2>
+    <table class="table table-light table-bordered table-responsive-sm caption-top ">
+        <thead>
+            <tr>
+                <th scope="row">Produto</th>
+                <th scope="row">Saldo Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for produto, saldo_total in saldo_total_por_produto.items %}
+                <tr>
+                    <td>{{ produto }}</td>
+                    <td class="table-active">{{ saldo_total }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <!-- Quantidades por Mês -->
+    <h2>Quantidades por Mês</h2>
+    <table class="table table-striped table-bordered table-responsive-sm caption-top ">
+        <thead>
+            <tr>
+                <th>Produto</th>
+                <th>Mês</th>
+                <th>Total Entrada</th>
+                <th>Total Saída</th>
+                <th>Saldo</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in itens_relatorio %}
+                <tr>
+                    <td>{{ item.produto }}</td>
+                    <td>{{ item.mes }}</td>
+                    <td>{{ item.total_entrada }}</td>
+                    <td>{{ item.total_saida }}</td>
+                    <td>{{ item.saldo }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    
 
+
+<a href="{% url 'relatorio' %}">Relatorio</a>
 <a href="{% url 'estoque' %}">Estoque</a>
 <a href="{% url 'funcionarios' %}">Funcionários</a>
 <a href="{% url 'produtos' %}">Produtos</a>
 {% endblock %}
+    
