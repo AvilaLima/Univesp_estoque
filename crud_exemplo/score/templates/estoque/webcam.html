@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Processar Estoque</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/quagga/0.12.1/quagga.min.js"></script>
+</head>
+<body>
+    <h1>Processar Estoque com Código de Barras</h1>
+
+    <!-- Seleção para Entrada ou Saída -->
+    <label for="acao">Ação:</label>
+    <select id="acao">
+        <option value="ENT">Entrada</option>
+        <option value="SAI">Saída</option>
+    </select>
+
+    <div id="interactive" class="viewport"></div>
+
+    <script>
+        // Inicializa o Quagga para leitura do código de barras
+        Quagga.init({
+            inputStream: {
+                name: "Live",
+                type: "LiveStream",
+                target: document.querySelector('#interactive'),
+                constraints: {
+                    width: 640,
+                    height: 480,
+                    facingMode: "environment"
+                }
+            },
+            decoder: {
+                readers: ["ean_reader","code_39_reader"] // Tipos de código de barrasDefina os leitores necessários
+            }
+        }, function(err) {
+            if (err) {
+                console.error(err);
+                return;
+            }
+            console.log("Quagga inicializado com sucesso.");
+            Quagga.start();
+        });
+
+        let isProcessing = false;
+
+        // Detecta o código de barras
+        Quagga.onDetected(function(result) {
+            if (!isProcessing && result && result.codeResult) {
+                isProcessing = true;
+                const barcode = result.codeResult.code;
+                const acao = document.getElementById('acao').value;
+                console.log("Código de barras detectado: ", barcode);
+
+                // Obtém a imagem da câmera
+                const video = document.querySelector('video');
+                const canvas = document.createElement('canvas');
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+                // Converte o canvas para Blob e envia para o servidor
+                canvas.toBlob(function(blob) {
+                    const formData = new FormData();
+                    const csrftoken = getCookie('csrftoken');
+                    formData.append('image', blob, 'barcode_image.png');
+
+                    // Envia o código de barras e a ação para o backend
+                    fetch('/process_barcode_image/', {
+                        method: 'POST',
+                        headers: { 'X-CSRFToken': csrftoken },
+                        body: formData,
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log("Resposta do servidor:", data);
+                        alert(data.message);  // Exibe a mensagem do servidor
+
+                        setTimeout(() => {
+                            isProcessing = false;  // Permite nova leitura após 3 segund os
+                        }, 3000);
+                    })
+                    .catch(error => {
+                        console.error('Erro:', error);
+                        isProcessing = false;
+                    });                
+                });
+            }
+        });
+        
+        // Função para gerar um beep sonoro
+        function beep() {
+            const audio = new Audio('/static/beep.mp3');  // Certifique-se de colocar o caminho correto para o arquivo de som
+            audio.play();
+        }
+
+        // Função para obter o token CSRF do cookie
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+    </script>
+</body>
+</html>

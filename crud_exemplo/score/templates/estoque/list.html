@@ -12,6 +12,7 @@
         <tr>
             <th>Data de Controle</th>
             <th>Ação</th>
+            <th>Código de Barras</th>
             <th>Quantidade</th>
             <th>Produto</th>
             <th>Funcionário</th>
@@ -29,6 +30,7 @@
                 {% else %}
                     <td class="col-sm-2">{{ item.data_controle }}</td> 
                     <td class="col-sm-1">{{ item.acao }}</td> 
+                    <td class="col-sm-1">{{ item.produto.codigo_barras }}</td> 
                     <td class="col-sm-1">{{ item.quantidade }}</td>   
                     <td class="col-sm-2">{{ item.produto }}</td> 
                     <td class="col-sm-2">{{ item.funcionario }}</td>         

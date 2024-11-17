@@ -10,6 +10,7 @@
     {% endif %} 
     <table class="table table-bordered table-light table-responsive-sm caption-top ">
         <tr>
+            <th class="col-sm-1">Cód. Barras</th>
             <th class="col-sm-1">Referência</th>
             <th class="col-sm-1">Marca</th>
             <th class="col-sm-1">Descrição</th>
@@ -26,6 +27,7 @@
                 {% if form.instance.id == produto.id %}      
                     {% include 'produtos/save.html' %}
                 {% else %}
+                    <td class="col-sm-1">{{ produto.codigo_barras }}</td>
                     <td class="col-sm-1">{{ produto.referencia }}</td> 
                     <td class="col-sm-1">{{ produto.marca }}</td> 
                     <td class="col-sm-2">{{ produto.descricao }}</td>  
@@ -43,4 +45,5 @@
 <a href="{% url 'estoque' %}">Estoque</a>
 <a href="{% url 'funcionarios' %}">Funcionários</a>
 <a href="{% url 'produtos' %}">Produtos</a>
+<a href="{% url 'exibir_webcam' %}">Processar Estoque</a>
 {% endblock %}
